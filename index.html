@@ -71,29 +71,37 @@
                 const reader = new FileReader();
                 reader.readAsDataURL(imageInput);
                 reader.onload = async function () {
-                    const base64Data = reader.result.split(',')[1];
+                    try {
+                        const base64Data = reader.result.split(',')[1];
 
-                    const response = await ai.models.generateContent({
-                        model: 'gemini-3.8-flash',
-                        contents: [
-                            {
-                                text: "Analyze this product photo for a local store. Write a catchy marketing caption for Instagram/TikTok and suggest 3 relevant hashtags."
-                            },
-                            {
-                                inlineData: {
-                                    mimeType: imageInput.type,
-                                    data: base64Data
+                        const response = await ai.models.generateContent({
+                            model: 'gemini-3.8-flash',
+                            contents: [
+                                {
+                                    text: "Analyze this product photo for a local store. Write a catchy marketing caption for Instagram/TikTok and suggest 3 relevant hashtags."
+                                },
+                                {
+                                    inlineData: {
+                                        mimeType: imageInput.type,
+                                        data: base64Data
+                                    }
                                 }
-                            }
-                        ]
-                    });
+                            ]
+                        });
 
-                    outputDiv.textContent = response.text;
-                    resultContainer.classList.remove('hidden');
-                    btn.textContent = 'Generate AI Ad 🚀';
-                    btn.disabled = false;
+                        outputDiv.textContent = response.text;
+                        resultContainer.classList.remove('hidden');
+                        btn.textContent = 'Generate AI Ad 🚀';
+                        btn.disabled = false;
+                    } catch (err) {
+                        console.error("API Error details:", err);
+                        alert('Gemini Error: ' + (err.message || JSON.stringify(err)));
+                        btn.textContent = 'Generate AI Ad 🚀';
+                        btn.disabled = false;
+                    }
                 };
             } catch (error) {
+                console.error("General Error:", error);
                 alert('Error: ' + error.message);
                 btn.textContent = 'Generate AI Ad 🚀';
                 btn.disabled = false;
